@@ -53,9 +53,69 @@
                 <p id="stat-overdue" class="text-3xl font-bold">0</p>
             </div>
         </section>
-        
+
+        <!--tool bar section - search, add and the rest-->
+        <section id="toolbar" class="space-y-3 rounded-lg bg-white p-4 shadow dark:bg-slate-800">
+            <div class="flex flex-wrap gap-3">
+                <input id="search-input" type="search" placeholder="Search title, description or category  ( press / )"
+                    class="min-w-0 flex-1 rounded border px-3 py-2 dark:bg-slate-700">
+                <button id="add-task-btn" type="button"
+                    class="rounded bg-green-700 px-4 py-2 font-semibold text-white hover:bg-green-800">
+                    + Add Task (N)
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
+                <div>
+                    <label for="filter-status" class="text-sm">Status</label>
+                    <select id="filter-status" class="w-full rounded border px-2 py-2 dark:bg-slate-700">
+                        <option value="all">All</option>
+                        <option value="completed">Completed</option>
+                        <option value="pending">Pending</option>
+                        <option value="overdue">Overdue</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="filter-priority" class="text-sm">Priority</label>
+                    <select id="filter-priority" class="w-full rounded border px-2 py-2 dark:bg-slate-700">
+                        <option value="all">All</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="filter-category" class="text-sm">Category</label>
+                    <select id="filter-category" class="w-full rounded border px-2 py-2 dark:bg-slate-700">
+                        <option value="all">All</option>
+                        <option value="work">Work</option>
+                        <option value="personal">Personal</option>
+                        <option value="school">School</option>
+                        <option value="backend">Backend</option>
+                        <option value="frontend">Frontend</option>
+                        <option value="fintech">Fintech</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="sort-select" class="text-sm">Sort by</label>
+                    <select id="sort-select" class="w-full rounded border px-2 py-2 dark:bg-slate-700">
+                        <option value="newest">Newest</option>
+                        <option value="oldest">Oldest</option>
+                        <option value="az">A → Z</option>
+                        <option value="za">Z → A</option>
+                        <option value="priority-high">Highest priority</option>
+                        <option value="priority-low">Lowest priority</option>
+                        <option value="due-soon">Closest due date</option>
+                        <option value="due-late">Furthest due date</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
     </main>
-    
+
 </body>
 
 </html>
