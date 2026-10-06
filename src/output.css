@@ -8,6 +8,8 @@
       "Segoe UI Symbol", "Noto Color Emoji";
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
+    --color-red-500: oklch(63.7% 0.237 25.331);
+    --color-red-600: oklch(57.7% 0.245 27.325);
     --color-green-400: oklch(79.2% 0.209 151.711);
     --color-green-700: oklch(52.7% 0.154 150.069);
     --color-green-800: oklch(44.8% 0.119 151.328);
@@ -187,6 +189,9 @@
   .mx-auto {
     margin-inline: auto;
   }
+  .ml-auto {
+    margin-left: auto;
+  }
   .flex {
     display: flex;
   }
@@ -259,6 +264,9 @@
     border-bottom-style: var(--tw-border-style);
     border-bottom-width: 1px;
   }
+  .border-red-500 {
+    border-color: var(--color-red-500);
+  }
   .border-slate-200 {
     border-color: var(--color-slate-200);
   }
@@ -270,6 +278,9 @@
   }
   .bg-white {
     background-color: var(--color-white);
+  }
+  .p-3 {
+    padding: calc(var(--spacing) * 3);
   }
   .p-4 {
     padding: calc(var(--spacing) * 4);
@@ -312,6 +323,9 @@
   .text-green-700 {
     color: var(--color-green-700);
   }
+  .text-red-600 {
+    color: var(--color-red-600);
+  }
   .text-slate-500 {
     color: var(--color-slate-500);
   }
@@ -334,6 +348,10 @@
   }
   .filter {
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
+  }
+  .select-all {
+    -webkit-user-select: all;
+    user-select: all;
   }
   @media (hover: hover) {
     .hover\:bg-green-800:hover {
