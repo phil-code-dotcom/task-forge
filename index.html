@@ -150,9 +150,122 @@
             <div id="pagination" class="mt-4 flex flex-wrap justify-center gap-2"></div>
         </section>
 
-
-
     </main>
+
+    <!-- for the undo toast, shown after a delete -->
+    <div id="undo-toast" class="hidden fixed bottom-4 left-1/2 z-40 -translate-x-1/2 items-center gap-3 rounded bg-slate-800 px-4 py-2 text-white">
+        <span id="undo-message">Task deleted.</span>
+        <button id="undo-btn" type="button" class="font-semibold underline">Undo</button>
+    </div>
+
+    <!--Task form modaL (used for both Add and Edit)-->
+    <div id="task-modal" class="modal hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 p-4">
+        <div class="mx-auto mt-10 w-full max-w-md rounded-lg bg-white p-6 shadow-lg dark:bg-slate-800">
+            <h2 id="form-title" class="mb-4 text-xl font-bold">New Task</h2>
+
+            <!-- novalidate turns off the browser's own popups so we can show our own error messages -->
+            <form id="task-form" novalidate class="space-y-3">
+                <!-- Holds the id of the task being edited (empty when adding) -->
+                <input type="hidden" id="task-id" name="id">
+
+                <div>
+                    <label for="task-title" class="block text-sm font-medium">Title</label>
+                    <input id="task-title" name="title" type="text" class="w-full rounded border px-3 py-2 dark:bg-slate-700">
+                    <p id="error-title" class="min-h-5 text-sm text-red-600"></p>
+                </div>
+
+                <div>
+                    <label for="task-description" class="block text-sm font-medium">Description</label>
+                    <textarea id="task-description" name="description" rows="3" class="w-full rounded border px-3 py-2 dark:bg-slate-700"></textarea>
+                    <p id="error-description" class="min-h-5 text-sm text-red-600"></p>
+                </div>
+
+                <div>
+                    <label for="task-category" class="block text-sm font-medium">Category</label>
+                    <select id="task-category" name="category" class="w-full rounded border px-3 py-2 dark:bg-slate-700">
+                        <option value="">Choose a category</option>
+                        <option value="work">Work</option>
+                        <option value="personal">Personal</option>
+                        <option value="school">School</option>
+                        <option value="backend">Backend</option>
+                        <option value="frontend">Frontend</option>
+                        <option value="fintech">Fintech</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <p id="error-category" class="min-h-5 text-sm text-red-600"></p>
+                </div>
+
+                <div>
+                    <label for="task-priority" class="block text-sm font-medium">Priority</label>
+                    <select id="task-priority" name="priority" class="w-full rounded border px-3 py-2 dark:bg-slate-700">
+                        <option value="">Choose a priority</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                    <p id="error-priority" class="min-h-5 text-sm text-red-600"></p>
+                </div>
+
+                <div>
+                    <label for="task-due" class="block text-sm font-medium">Due date</label>
+                    <input id="task-due" name="dueDate" type="date" class="w-full rounded border px-3 py-2 dark:bg-slate-700">
+                    <p id="error-dueDate" class="min-h-5 text-sm text-red-600"></p>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2">
+                    <button id="form-cancel" type="button" class="rounded border px-4 py-2">Cancel</button>
+                    <button id="form-submit" type="submit" class="rounded bg-green-700 px-4 py-2 font-semibold text-white">Add task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!--delete confirmation modal-->
+    <div id="delete-modal" class="modal hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 p-4">
+        <div class="mx-auto mt-24 w-full max-w-sm rounded-lg bg-white p-6 shadow-lg dark:bg-slate-800">
+            <h2 class="mb-2 text-xl font-bold">Delete task?</h2>
+            <p id="delete-message" class="mb-4 text-slate-600 dark:text-slate-300">This cannot be undone.</p>
+            <div class="flex justify-end gap-2">
+                <button id="delete-cancel" type="button" class="rounded border px-4 py-2">Cancel</button>
+                <button id="delete-confirm" type="button" class="rounded bg-red-600 px-4 py-2 font-semibold text-white">Delete</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!--Discard changes modal-->
+    <div id="discard-modal" class="modal hidden fixed inset-0 z-[60] overflow-y-auto bg-black/50 p-4">
+        <div class="mx-auto mt-24 w-full max-w-sm rounded-lg bg-white p-6 shadow-lg dark:bg-slate-800">
+            <h2 class="mb-2 text-xl font-bold">Discard changes?</h2>
+            <p class="mb-4 text-slate-600 dark:text-slate-300">You have unsaved changes. If you leave now they will be lost.</p>
+            <div class="flex justify-end gap-2">
+                <button id="discard-keep" type="button" class="rounded border px-4 py-2">Keep editing</button>
+                <button id="discard-confirm" type="button" class="rounded bg-red-600 px-4 py-2 font-semibold text-white">Discard</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!--task detail modal-->
+    <div id="details-modal" class="modal hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 p-4">
+        <div class="mx-auto mt-16 w-full max-w-md rounded-lg bg-white p-6 shadow-lg dark:bg-slate-800">
+            <h2 id="detail-title" class="mb-3 text-xl font-bold"></h2>
+            <dl class="space-y-2">
+                <div><dt class="text-sm text-slate-500">Description</dt><dd id="detail-description"></dd></div>
+                <div><dt class="text-sm text-slate-500">Category</dt><dd id="detail-category"></dd></div>
+                <div><dt class="text-sm text-slate-500">Priority</dt><dd id="detail-priority"></dd></div>
+                <div><dt class="text-sm text-slate-500">Status</dt><dd id="detail-status"></dd></div>
+                <div><dt class="text-sm text-slate-500">Due date</dt><dd id="detail-due"></dd></div>
+                <div><dt class="text-sm text-slate-500">Created</dt><dd id="detail-created"></dd></div>
+            </dl>
+            <div class="mt-5 flex justify-end gap-2">
+                <button id="detail-close" type="button" class="rounded border px-4 py-2">Close</button>
+                <button id="detail-edit" type="button" class="rounded border px-4 py-2">Edit</button>
+                <button id="detail-delete" type="button" class="rounded bg-red-600 px-4 py-2 text-white">Delete</button>
+            </div>
+        </div>
+    </div>
 
 </body>
 
