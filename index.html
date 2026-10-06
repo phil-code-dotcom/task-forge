@@ -129,7 +129,28 @@
             </div>
         </section>
 
-        
+        <!-- task list + empty states + pagination-->
+        <section>
+            <!-- JS fills this list with task cards -->
+            <ul id="task-list" class="space-y-3"></ul>
+
+            <!-- Shown when there are no tasks at all -->
+            <!-- <div id="empty-state" class="hidden rounded-lg bg-white p-8 text-center shadow dark:bg-slate-800">
+                <p class="text-lg font-semibold">No tasks yet</p>
+                <p class="text-slate-500 dark:text-slate-400">Press N or click Add Task to create your first one.</p>
+            </div> -->
+
+            <!-- Shown when search/filters match nothing -->
+            <div id="no-results" class="hidden rounded-lg bg-white p-8 text-center shadow dark:bg-slate-800">
+                <p class="text-lg font-semibold">No tasks found</p>
+                <p class="text-slate-500 dark:text-slate-400">Try a different search or clear your filters.</p>
+            </div>
+
+            <!--pagination buttons will be generated here -->
+            <div id="pagination" class="mt-4 flex flex-wrap justify-center gap-2"></div>
+        </section>
+
+
 
     </main>
 
