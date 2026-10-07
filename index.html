@@ -7,27 +7,33 @@
     <link href="./src/output.css" rel="stylesheet">
     <title>TaskForge</title>
 
-    <!-- Tailwind via CDN. darkMode: 'class' means dark styles apply when <html> has the class "dark" -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { darkMode: 'class' };
-    </script>
-
-    <link rel="stylesheet" href="style.css">
+    <!-- <link rel="stylesheet" href="style.css"> -->
 </head>
 
-<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100">
+<!-- bg-slate-50 -->
+
+<body class="text-black dark:bg-slate-900 dark:text-slate-100 font-display">
 
     <header class="border-b border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
         <div class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 p-4">
-            <h1 class="text-2xl font-bold text-green-700 dark:text-green-400">TaskForge</h1>
+            <h1 class="text-2xl font-bold text-blue-600
+             dark:text-blue-400">TaskForge</h1>
 
             <nav class="flex flex-wrap items-center gap-2">
-                <button id="export-btn" type="button" class="rounded border px-3 py-1 text-sm">Export</button>
-                <button id="import-btn" type="button" class="rounded border px-3 py-1 text-sm">Import</button>
+                <button type="button"
+                    class="text-fg-brand bg-neutral-primary border border-brand hover:bg-brand hover:text-white focus:ring-4 focus:ring-brand-subtle font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none">Export</button>
+                <!-- <button id="export-btn" type="button" class="rounded border px-3 py-1 text-sm">Export</button> -->
+
+                <!-- <button id="import-btn" type="button" class="rounded border px-3 py-1 text-sm">Import</button> -->
+                <button type="button"
+                    class="text-fg-brand bg-neutral-primary border border-brand hover:bg-brand hover:text-white focus:ring-4 focus:ring-brand-subtle font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none">Import</button>
+
                 <!-- Hidden file input: the Import button will click this one from JS -->
                 <input id="import-input" type="file" accept=".json" class="hidden">
-                <button id="theme-toggle" type="button" class="rounded border px-3 py-1 text-sm">Dark mode</button>
+                <!-- <button id="theme-toggle" type="button" class="rounded border px-3 py-1 text-sm">Dark mode</button> -->
+                <button type="button"
+                    class="text-white bg-brand box-border border border-transparent hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none">Dark
+                    mode</button>
             </nav>
         </div>
     </header>
@@ -59,10 +65,13 @@
             <div class="flex flex-wrap gap-3">
                 <input id="search-input" type="search" placeholder="Search title, description or category  ( press / )"
                     class="min-w-0 flex-1 rounded border px-3 py-2 dark:bg-slate-700">
-                <button id="add-task-btn" type="button"
+                <!-- <button id="add-task-btn" type="button"
                     class="rounded bg-green-700 px-4 py-2 font-semibold text-white hover:bg-green-800">
                     + Add Task (N)
-                </button>
+                </button> -->
+                <button type="button"
+                    class="text-white bg-brand hover:bg-brand-strong box-border border border-transparent focus:ring-4 focus:ring-brand-medium shadow-xs font-medium rounded-base text-base px-6 py-3.5 focus:outline-none">Add
+                    Task</button>
             </div>
 
             <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -124,11 +133,17 @@
             <span id="selected-count" class="text-sm text-slate-500 dark:text-slate-400">0 selected</span>
 
             <div class="ml-auto flex flex-wrap gap-2">
-                <button id="bulk-complete" type="button" class="rounded border px-3 py-1 text-sm">Mark
+                <!-- <button id="bulk-complete" type="button" class="rounded border px-3 py-1 text-sm">Mark
+                    completed</button> -->
+                <button type="button"
+                    class="text-fg-brand bg-neutral-primary border border-brand hover:bg-brand hover:text-white focus:ring-4 focus:ring-brand-subtle font-medium leading-5 rounded-base text-xs px-3 py-1.5 focus:outline-none">Mark
                     completed</button>
-                <button id="bulk-pending" type="button" class="rounded border px-3 py-1 text-sm">Mark pending</button>
-                <button id="bulk-delete" type="button"
-                    class="rounded border border-red-500 px-3 py-1 text-sm text-red-600">Delete selected</button>
+                <!-- <button id="bulk-pending" type="button" class="rounded border px-3 py-1 text-sm">Mark pending</button> -->
+                <button type="button"
+                    class="text-fg-brand bg-neutral-primary border border-brand hover:bg-brand hover:text-white focus:ring-4 focus:ring-brand-subtle font-medium leading-5 rounded-base text-xs px-3 py-1.5 focus:outline-none">Mark pending</button>
+                <!-- <button id="bulk-delete" type="button"
+                    class="rounded border border-red-500 px-3 py-1 text-sm text-red-600">Delete selected</button> -->
+                <button type="button" class="text-red-600 bg-neutral-primary border border-red-500 hover:bg-red-600 hover:text-white focus:ring-4 focus:ring-brand-subtle font-medium leading-5 rounded-base text-xs px-3 py-1.5 focus:outline-none">Delete selected</button>
             </div>
         </section>
 
@@ -138,10 +153,10 @@
             <ul id="task-list" class="space-y-3"></ul>
 
             <!-- Shown when there are no tasks at all -->
-            <!-- <div id="empty-state" class="hidden rounded-lg bg-white p-8 text-center shadow dark:bg-slate-800">
+            <div id="empty-state" class="hidden rounded-lg bg-white p-8 text-center shadow dark:bg-slate-800">
                 <p class="text-lg font-semibold">No tasks yet</p>
                 <p class="text-slate-500 dark:text-slate-400">Press N or click Add Task to create your first one.</p>
-            </div> -->
+            </div>
 
             <!-- Shown when search/filters match nothing -->
             <div id="no-results" class="hidden rounded-lg bg-white p-8 text-center shadow dark:bg-slate-800">
@@ -244,6 +259,8 @@
         </div>
     </div>
 
+    <!--flowbite modal-->
+
 
     <!--Discard changes modal-->
     <div id="discard-modal" class="modal hidden fixed inset-0 z-[60] overflow-y-auto bg-black/50 p-4">
@@ -327,8 +344,11 @@
         </li>
     </template>
 
-    
+    <script src="./node_modules/flowbite/dist/flowbite.min.js"></script>
+
     <script src="app.js"></script>
+
+
 
 </body>
 
