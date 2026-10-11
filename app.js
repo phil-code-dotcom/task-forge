@@ -39,6 +39,12 @@ const filterPriority = document.getElementById("filter-priority");
 const filterCategory = document.getElementById("filter-category");
 const sortSelect = document.getElementById("sort-select");
 
+const selectAll = document.getElementById("select-all");
+const selectedCount = document.getElementById("selected-count");
+const bulkComplete = document.getElementById("bulk-complete");
+const bulkPending = document.getElementById("bulk-pending");
+const bulkDelete = document.getElementById("bulk-delete");
+
 const emptyState = document.getElementById("empty-state");
 const noResults = document.getElementById("no-results");
 
@@ -47,8 +53,11 @@ const formTitle = document.getElementById("form-title");
 // id of the task being edited (null means we are adding a new task)
 let editingId = null;
 
-// id of the task waiting to be deleted
-let taskToDeleteId = null;
+// ids of the tasks that are ticked
+let selectedIds = [];
+
+// ids of the tasks waiting to be deleted
+let idsToDelete = [];
 
 // array to store tasks
 let tasks = JSON.parse(localStorage.getItem("taskforge-tasks"));
@@ -140,6 +149,9 @@ function createTaskCard(task) {
     card.querySelector(".task-due").textContent = formatDate(task.dueDate);
     card.querySelector(".task-created").textContent = new Date(task.createdAt).toLocaleDateString();
 
+    // tick the checkbox if the task is selected
+    card.querySelector(".task-select").checked = selectedIds.includes(task.id);
+
     // classes for the colors (they are in style.css)
     card.classList.add("priority-" + task.priority);
 
@@ -226,6 +238,9 @@ function getVisibleTasks() {
 function renderTasks() {
     const visibleTasks = getVisibleTasks();
 
+    // a task that is not on the screen cannot stay selected
+    selectedIds = selectedIds.filter((id) => visibleTasks.some((task) => task.id === id));
+
     taskList.replaceChildren();
 
     visibleTasks.forEach((task) => {
@@ -239,6 +254,38 @@ function renderTasks() {
     noResults.classList.toggle("hidden", tasks.length === 0 || visibleTasks.length > 0);
 
     updateStats();
+    updateSelection();
+}
+
+// show the selected count and update the select all box
+function updateSelection() {
+    const boxes = taskList.querySelectorAll(".task-select");
+
+    let allChecked = boxes.length > 0;
+    boxes.forEach((box) => {
+        if (!box.checked) {
+            allChecked = false;
+        }
+    });
+
+    selectAll.checked = allChecked;
+    selectedCount.textContent = selectedIds.length + " selected";
+}
+
+// mark all the selected tasks as completed or pending
+function bulkSetCompleted(value) {
+    if (selectedIds.length === 0) {
+        return;
+    }
+
+    tasks.forEach((task) => {
+        if (selectedIds.includes(task.id)) {
+            task.completed = value;
+        }
+    });
+
+    saveTasks();
+    renderTasks();
 }
 
 // fill the four numbers at the top
@@ -265,21 +312,28 @@ function completeTask(task) {
     renderTasks();
 }
 
-// open the delete modal and remember which task it is for
-function openDeleteModal(task) {
-    taskToDeleteId = task.id;
-    deleteMessage.textContent = 'Do you really want to delete "' + task.title + '"?';
+// open the delete modal and remember which tasks it is for
+function openDeleteModal(ids) {
+    idsToDelete = ids;
+
+    if (ids.length === 1) {
+        const task = tasks.find((item) => item.id === ids[0]);
+        deleteMessage.textContent = 'Do you really want to delete "' + task.title + '"?';
+    } else {
+        deleteMessage.textContent = "Do you really want to delete these " + ids.length + " tasks?";
+    }
+
     deleteModal.classList.remove("hidden");
 }
 
 function closeDeleteModal() {
     deleteModal.classList.add("hidden");
-    taskToDeleteId = null;
+    idsToDelete = [];
 }
 
-// remove the task from the array
+// remove the tasks from the array
 function confirmDelete() {
-    tasks = tasks.filter((task) => task.id !== taskToDeleteId);
+    tasks = tasks.filter((task) => !idsToDelete.includes(task.id));
     saveTasks();
     renderTasks();
     closeDeleteModal();
@@ -416,9 +470,51 @@ taskList.addEventListener("click", function (event) {
     if (action === "complete") {
         completeTask(task);
     } else if (action === "delete") {
-        openDeleteModal(task);
+        openDeleteModal([task.id]);
     } else if (action === "edit") {
         editTask(task);
+    }
+});
+
+// checkboxes send a change event, so they get their own listener on the list
+taskList.addEventListener("change", function (event) {
+    const checkbox = event.target.closest('[data-action="select"]');
+
+    if (checkbox === null) {
+        return;
+    }
+
+    const task = getTaskFromElement(checkbox);
+
+    if (checkbox.checked) {
+        selectedIds.push(task.id);
+    } else {
+        selectedIds = selectedIds.filter((id) => id !== task.id);
+    }
+
+    updateSelection();
+});
+
+selectAll.addEventListener("change", function () {
+    const boxes = taskList.querySelectorAll(".task-select");
+    selectedIds = [];
+
+    boxes.forEach((box) => {
+        box.checked = selectAll.checked;
+
+        if (selectAll.checked) {
+            selectedIds.push(getTaskFromElement(box).id);
+        }
+    });
+
+    updateSelection();
+});
+
+bulkComplete.addEventListener("click", () => bulkSetCompleted(true));
+bulkPending.addEventListener("click", () => bulkSetCompleted(false));
+bulkDelete.addEventListener("click", function () {
+    if (selectedIds.length > 0) {
+        openDeleteModal(selectedIds);
     }
 });
 
