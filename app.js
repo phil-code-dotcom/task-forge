@@ -28,6 +28,14 @@ const statCompleted = document.getElementById("stat-completed");
 const statPending = document.getElementById("stat-pending");
 const statOverdue = document.getElementById("stat-overdue");
 
+const deleteModal = document.getElementById("delete-modal");
+const deleteMessage = document.getElementById("delete-message");
+const deleteCancel = document.getElementById("delete-cancel");
+const deleteConfirm = document.getElementById("delete-confirm");
+
+// id of the task waiting to be deleted
+let taskToDeleteId = null;
+
 // array to store tasks
 let tasks = JSON.parse(localStorage.getItem("taskforge-tasks"));
 
@@ -181,6 +189,26 @@ function completeTask(task) {
     renderTasks();
 }
 
+// open the delete modal and remember which task it is for
+function openDeleteModal(task) {
+    taskToDeleteId = task.id;
+    deleteMessage.textContent = 'Do you really want to delete "' + task.title + '"?';
+    deleteModal.classList.remove("hidden");
+}
+
+function closeDeleteModal() {
+    deleteModal.classList.add("hidden");
+    taskToDeleteId = null;
+}
+
+// remove the task from the array
+function confirmDelete() {
+    tasks = tasks.filter((task) => task.id !== taskToDeleteId);
+    saveTasks();
+    renderTasks();
+    closeDeleteModal();
+}
+
 // modal pop up to create tasks
 function createTask() {
     addModal.classList.remove("hidden");
@@ -278,8 +306,13 @@ taskList.addEventListener("click", function (event) {
 
     if (action === "complete") {
         completeTask(task);
+    } else if (action === "delete") {
+        openDeleteModal(task);
     }
 });
+
+deleteCancel.addEventListener("click", closeDeleteModal);
+deleteConfirm.addEventListener("click", confirmDelete);
 
 addTaskBtn.addEventListener("click", createTask);
 formSubmit.addEventListener("click", modalAddTask);
