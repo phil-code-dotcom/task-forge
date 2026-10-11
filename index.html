@@ -65,7 +65,7 @@
             <div class="flex flex-wrap gap-3">
                 <input id="search-input" type="search" placeholder="Search title, description or category  ( press / )"
                     class="min-w-0 flex-1 rounded border px-3 py-2 dark:bg-slate-700">
-                
+
                 <button id="add-task-btn" type="button"
                     class="text-white bg-brand hover:bg-brand-strong box-border border border-transparent focus:ring-4 focus:ring-brand-medium shadow-xs font-medium rounded-base text-base px-6 py-3.5 focus:outline-none">Add
                     Task or N</button>
@@ -137,10 +137,13 @@
                     completed</button>
                 <!-- <button id="bulk-pending" type="button" class="rounded border px-3 py-1 text-sm">Mark pending</button> -->
                 <button type="button"
-                    class="text-fg-brand bg-neutral-primary border border-brand hover:bg-brand hover:text-white focus:ring-4 focus:ring-brand-subtle font-medium leading-5 rounded-base text-xs px-3 py-1.5 focus:outline-none">Mark pending</button>
+                    class="text-fg-brand bg-neutral-primary border border-brand hover:bg-brand hover:text-white focus:ring-4 focus:ring-brand-subtle font-medium leading-5 rounded-base text-xs px-3 py-1.5 focus:outline-none">Mark
+                    pending</button>
                 <!-- <button id="bulk-delete" type="button"
                     class="rounded border border-red-500 px-3 py-1 text-sm text-red-600">Delete selected</button> -->
-                <button type="button" class="text-red-600 bg-neutral-primary border border-red-500 hover:bg-red-600 hover:text-white focus:ring-4 focus:ring-brand-subtle font-medium leading-5 rounded-base text-xs px-3 py-1.5 focus:outline-none">Delete selected</button>
+                <button type="button"
+                    class="text-red-600 bg-neutral-primary border border-red-500 hover:bg-red-600 hover:text-white focus:ring-4 focus:ring-brand-subtle font-medium leading-5 rounded-base text-xs px-3 py-1.5 focus:outline-none">Delete
+                    selected</button>
             </div>
         </section>
 
@@ -235,9 +238,12 @@
                 </div>
 
                 <div class="flex justify-end gap-2 pt-2">
-                    <button id="form-cancel" type="button" class="text-fg-brand bg-neutral-primary border border-brand hover:bg-brand hover:text-white focus:ring-4 focus:ring-brand-subtle font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none">Cancel</button>
-                    
-                    <button id="form-submit" type="submit" class="text-white bg-brand box-border border border-transparent hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none">Add Task</button>
+                    <button id="form-cancel" type="button"
+                        class="text-fg-brand bg-neutral-primary border border-brand hover:bg-brand hover:text-white focus:ring-4 focus:ring-brand-subtle font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none">Cancel</button>
+
+                    <button id="form-submit" type="submit"
+                        class="text-white bg-brand box-border border border-transparent hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none">Add
+                        Task</button>
                 </div>
             </form>
         </div>
@@ -333,10 +339,12 @@
             </div>
 
             <div class="task-actions flex flex-col gap-1 text-sm sm:flex-row">
-                <button type="button" class="rounded border px-2 py-1" data-action="complete">Complete</button>
-                <button type="button" class="rounded border px-2 py-1" data-action="edit">Edit</button>
-                <button type="button" class="rounded border border-red-500 px-2 py-1 text-red-600"
-                    data-action="delete">Delete</button>
+                <button type="button" data-action="complete"
+                    class="text-fg-brand bg-neutral-primary border border-brand hover:bg-brand hover:text-white focus:ring-4 focus:ring-brand-subtle font-medium leading-5 rounded-base text-xs px-3 py-1.5 focus:outline-none">Complete</button>
+                <button type="button" data-action="edit"
+                    class="text-fg-brand bg-neutral-primary border border-brand hover:bg-brand hover:text-white focus:ring-4 focus:ring-brand-subtle font-medium leading-5 rounded-base text-xs px-3 py-1.5 focus:outline-none">Edit</button>
+                <button type="button" data-action="delete"
+                    class="text-red-600 bg-neutral-primary border border-red-500 hover:bg-red-600 hover:text-white focus:ring-4 focus:ring-brand-subtle font-medium leading-5 rounded-base text-xs px-3 py-1.5 focus:outline-none">Delete</button>
             </div>
         </li>
     </template>

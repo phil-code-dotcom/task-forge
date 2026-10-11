@@ -2,7 +2,11 @@
 // document.documentElement.classList.toggle("dark");
 
 // declarations
-const tasks = []; // to store the tasks
+const tasks = JSON.parse(localStorage.getItem("tasks")) || []; // to store the tasks
+
+const taskList = document.getElementById("task-list");
+const taskTemplate = document.getElementById("task-template");
+displayTasks();
 
 // for the add task main button
 const addTaskBtn = document.getElementById("add-task-btn");
@@ -29,8 +33,6 @@ const errorPriority = document.getElementById("error-priority");
 const errorTaskDue = document.getElementById("error-dueDate")
 
 // empty list for tasks to be added
-const taskList = getElementById("task-list");
-
 
 addTaskBtn.addEventListener("click", createTask)
 
@@ -38,8 +40,23 @@ formSubmit.addEventListener("click", modalAddTask)
 
 formCancel.addEventListener("click", modalCancel)
 
+function displayTasks() {
+    tasks.forEach(element => {
+        let card = taskTemplate.content.firstElementChild.cloneNode(true);
+
+        card.querySelector(".task-title").textContent = element.title;
+        card.querySelector(".task-description").textContent = element.description;
+        card.querySelector(".task-category").textContent = element.category;
+        card.querySelector(".task-priority").textContent = element.priority;
+        card.querySelector(".task-due").textContent = element.dueDate;
+
+        taskList.prepend(card);
+    });
+}
+
 function createTask() {
     addModal.classList.remove("hidden");
+    // localStorage.clear();
 }
 
 function modalAddTask(event) {
@@ -66,13 +83,30 @@ function modalAddTask(event) {
     }
 
     if ((addTaskTitle.value.length > 1) && (addTaskDescription.value.length > 1) && (addTaskCategory.value.length > 1) && (addTaskPriority.value.length > 1) && (addTaskDue.value.length > 1)) {
-        
+
         let myTaskInfo = { title: addTaskTitle.value, description: addTaskDescription.value, category: addTaskCategory.value, priority: addTaskPriority.value, dueDate: addTaskDue.value };
 
         // console.log(myTaskInfo)
 
+        // localStorage.setItem("tasks", JSON.stringify(myTaskInfo));
+
+        appendToStoredArray("tasks", myTaskInfo);
+        tasks.push(myTaskInfo);
+        console.log(tasks);
+
+        let card = taskTemplate.content.firstElementChild.cloneNode(true);
+
+        card.querySelector(".task-title").textContent = addTaskTitle.value;
+        card.querySelector(".task-description").textContent = addTaskDescription.value;
+        card.querySelector(".task-category").textContent = addTaskCategory.value;
+        card.querySelector(".task-priority").textContent = addTaskPriority.value;
+        card.querySelector(".task-due").textContent = addTaskDue.value;
+
+        taskList.prepend(card);
+
+        // to re-assign my input to be empty
         errorTitle.innerHTML = ""; errorDescription.innerHTML = ""; errorCategory.innerHTML = ""; errorPriority.innerHTML = ""; errorTaskDue.innerHTML = "";
-        addTaskTitle.value = ""; addTaskDescription.value = ""; addTaskCategory.value = ""; addTaskPriority.value = ""; addTaskDue.value = ""; 
+        addTaskTitle.value = ""; addTaskDescription.value = ""; addTaskCategory.value = ""; addTaskPriority.value = ""; addTaskDue.value = "";
 
     }
 
@@ -81,4 +115,11 @@ function modalAddTask(event) {
 
 function modalCancel() {
     addModal.classList.add("hidden")
+}
+
+// to append to the stored files in local storage
+function appendToStoredArray(key, newItem) {
+    const arr = JSON.parse(localStorage.getItem(key)) || [];
+    arr.push(newItem);
+    localStorage.setItem(key, JSON.stringify(arr));
 }
