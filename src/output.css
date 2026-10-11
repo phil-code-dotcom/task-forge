@@ -1,5 +1,5 @@
 /*! tailwindcss v4.3.3 | MIT License | https://tailwindcss.com */
-/* @import url('https://googleapis.com'); */
+@import url('https://googleapis.com');
 @import url('https://api.fontshare.com/v2/css?f[]=satoshi@1,2&display=swap');
 @layer properties;
 :root, :host {

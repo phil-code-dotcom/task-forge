@@ -48,10 +48,32 @@ const bulkDelete = document.getElementById("bulk-delete");
 const emptyState = document.getElementById("empty-state");
 const noResults = document.getElementById("no-results");
 
+const detailsModal = document.getElementById("details-modal");
+const detailTitle = document.getElementById("detail-title");
+const detailDescription = document.getElementById("detail-description");
+const detailCategory = document.getElementById("detail-category");
+const detailPriority = document.getElementById("detail-priority");
+const detailStatus = document.getElementById("detail-status");
+const detailDue = document.getElementById("detail-due");
+const detailCreated = document.getElementById("detail-created");
+const detailClose = document.getElementById("detail-close");
+const detailEdit = document.getElementById("detail-edit");
+const detailDelete = document.getElementById("detail-delete");
+
+const discardModal = document.getElementById("discard-modal");
+const discardKeep = document.getElementById("discard-keep");
+const discardConfirm = document.getElementById("discard-confirm");
+
 const formTitle = document.getElementById("form-title");
 
 // id of the task being edited (null means we are adding a new task)
 let editingId = null;
+
+// id of the task shown in the details modal
+let detailsId = null;
+
+// how the form looked when the edit started
+let formSnapshot = "";
 
 // ids of the tasks that are ticked
 let selectedIds = [];
@@ -89,6 +111,17 @@ function formatDate(dateString) {
 // overdue means not completed and the due date is before today
 function isOverdue(task) {
     return !task.completed && task.dueDate < getDateString(0);
+}
+
+// the status text of a task
+function getStatus(task) {
+    if (task.completed) {
+        return "Completed";
+    }
+    if (isOverdue(task)) {
+        return "Overdue";
+    }
+    return "Pending";
 }
 
 // gives a date like 2026-10-10, moved by some days from today
@@ -166,13 +199,7 @@ function createTaskCard(task) {
     }
 
     // status text
-    let status = "Pending";
-    if (task.completed) {
-        status = "Completed";
-    } else if (isOverdue(task)) {
-        status = "Overdue";
-    }
-    card.querySelector(".task-status").textContent = status;
+    card.querySelector(".task-status").textContent = getStatus(task);
 
     // complete button text
     const completeBtn = card.querySelector('[data-action="complete"]');
@@ -312,6 +339,48 @@ function completeTask(task) {
     renderTasks();
 }
 
+// show the details modal for one task
+function openDetails(task) {
+    detailsId = task.id;
+
+    detailTitle.textContent = task.title;
+    detailDescription.textContent = task.description;
+    detailCategory.textContent = capitalize(task.category);
+    detailPriority.textContent = capitalize(task.priority);
+    detailStatus.textContent = getStatus(task);
+    detailDue.textContent = formatDate(task.dueDate);
+    detailCreated.textContent = new Date(task.createdAt).toLocaleDateString();
+
+    detailsModal.classList.remove("hidden");
+}
+
+function closeDetails() {
+    detailsModal.classList.add("hidden");
+    detailsId = null;
+}
+
+// all the form values in one text, to compare before and after
+function getFormValues() {
+    return JSON.stringify([
+        addTaskTitle.value,
+        addTaskDescription.value,
+        addTaskCategory.value,
+        addTaskPriority.value,
+        addTaskDue.value
+    ]);
+}
+
+// cancel button: ask first if an edit has unsaved changes
+function requestCancel() {
+    const hasChanges = editingId !== null && getFormValues() !== formSnapshot;
+
+    if (hasChanges) {
+        discardModal.classList.remove("hidden");
+    } else {
+        modalCancel();
+    }
+}
+
 // open the delete modal and remember which tasks it is for
 function openDeleteModal(ids) {
     idsToDelete = ids;
@@ -337,6 +406,7 @@ function confirmDelete() {
     saveTasks();
     renderTasks();
     closeDeleteModal();
+    closeDetails();
 }
 
 // modal pop up to create tasks
@@ -361,6 +431,8 @@ function editTask(task) {
     addTaskCategory.value = task.category;
     addTaskPriority.value = task.priority;
     addTaskDue.value = task.dueDate;
+
+    formSnapshot = getFormValues();
 
     addModal.classList.remove("hidden");
 }
@@ -473,6 +545,8 @@ taskList.addEventListener("click", function (event) {
         openDeleteModal([task.id]);
     } else if (action === "edit") {
         editTask(task);
+    } else if (action === "details") {
+        openDetails(task);
     }
 });
 
@@ -529,6 +603,24 @@ deleteConfirm.addEventListener("click", confirmDelete);
 
 addTaskBtn.addEventListener("click", createTask);
 formSubmit.addEventListener("click", modalAddTask);
-formCancel.addEventListener("click", modalCancel);
+formCancel.addEventListener("click", requestCancel);
+
+detailClose.addEventListener("click", closeDetails);
+detailEdit.addEventListener("click", function () {
+    const task = tasks.find((item) => item.id === detailsId);
+    closeDetails();
+    editTask(task);
+});
+detailDelete.addEventListener("click", function () {
+    openDeleteModal([detailsId]);
+});
+
+discardKeep.addEventListener("click", function () {
+    discardModal.classList.add("hidden");
+});
+discardConfirm.addEventListener("click", function () {
+    discardModal.classList.add("hidden");
+    modalCancel();
+});
 
 renderTasks();
