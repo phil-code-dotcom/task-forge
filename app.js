@@ -33,6 +33,15 @@ const deleteMessage = document.getElementById("delete-message");
 const deleteCancel = document.getElementById("delete-cancel");
 const deleteConfirm = document.getElementById("delete-confirm");
 
+const searchInput = document.getElementById("search-input");
+const filterStatus = document.getElementById("filter-status");
+const filterPriority = document.getElementById("filter-priority");
+const filterCategory = document.getElementById("filter-category");
+const sortSelect = document.getElementById("sort-select");
+
+const emptyState = document.getElementById("empty-state");
+const noResults = document.getElementById("no-results");
+
 const formTitle = document.getElementById("form-title");
 
 // id of the task being edited (null means we are adding a new task)
@@ -160,12 +169,74 @@ function createTaskCard(task) {
     return card;
 }
 
+// search, filters and sorting all together
+function getVisibleTasks() {
+    const search = searchInput.value.trim().toLowerCase();
+    const status = filterStatus.value;
+    const priority = filterPriority.value;
+    const category = filterCategory.value;
+    const sort = sortSelect.value;
+
+    // keep only the tasks that pass every check
+    const list = tasks.filter((task) => {
+        const matchesSearch =
+            task.title.toLowerCase().includes(search) ||
+            task.description.toLowerCase().includes(search) ||
+            task.category.toLowerCase().includes(search);
+
+        let matchesStatus = true;
+        if (status === "completed") {
+            matchesStatus = task.completed;
+        } else if (status === "pending") {
+            matchesStatus = !task.completed;
+        } else if (status === "overdue") {
+            matchesStatus = isOverdue(task);
+        }
+
+        const matchesPriority = priority === "all" || task.priority === priority;
+        const matchesCategory = category === "all" || task.category === category;
+
+        return matchesSearch && matchesStatus && matchesPriority && matchesCategory;
+    });
+
+    // a bigger number means a higher priority
+    const priorityNumber = { low: 1, medium: 2, high: 3, critical: 4 };
+
+    if (sort === "newest") {
+        list.sort((a, b) => b.createdAt - a.createdAt);
+    } else if (sort === "oldest") {
+        list.sort((a, b) => a.createdAt - b.createdAt);
+    } else if (sort === "az") {
+        list.sort((a, b) => a.title.localeCompare(b.title));
+    } else if (sort === "za") {
+        list.sort((a, b) => b.title.localeCompare(a.title));
+    } else if (sort === "priority-high") {
+        list.sort((a, b) => priorityNumber[b.priority] - priorityNumber[a.priority]);
+    } else if (sort === "priority-low") {
+        list.sort((a, b) => priorityNumber[a.priority] - priorityNumber[b.priority]);
+    } else if (sort === "due-soon") {
+        list.sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+    } else if (sort === "due-late") {
+        list.sort((a, b) => b.dueDate.localeCompare(a.dueDate));
+    }
+
+    return list;
+}
+
 function renderTasks() {
+    const visibleTasks = getVisibleTasks();
+
     taskList.replaceChildren();
 
-    tasks.forEach((task) => {
+    visibleTasks.forEach((task) => {
         taskList.append(createTaskCard(task));
     });
+
+    // no tasks at all
+    emptyState.classList.toggle("hidden", tasks.length > 0);
+
+    // there are tasks but the search or filters found nothing
+    noResults.classList.toggle("hidden", tasks.length === 0 || visibleTasks.length > 0);
 
     updateStats();
 }
@@ -350,6 +421,12 @@ taskList.addEventListener("click", function (event) {
         editTask(task);
     }
 });
+
+searchInput.addEventListener("input", renderTasks);
+filterStatus.addEventListener("change", renderTasks);
+filterPriority.addEventListener("change", renderTasks);
+filterCategory.addEventListener("change", renderTasks);
+sortSelect.addEventListener("change", renderTasks);
 
 deleteCancel.addEventListener("click", closeDeleteModal);
 deleteConfirm.addEventListener("click", confirmDelete);
