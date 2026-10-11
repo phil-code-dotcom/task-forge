@@ -2,124 +2,198 @@
 // document.documentElement.classList.toggle("dark");
 
 // declarations
-const tasks = JSON.parse(localStorage.getItem("tasks")) || []; // to store the tasks
-
 const taskList = document.getElementById("task-list");
 const taskTemplate = document.getElementById("task-template");
-displayTasks();
 
-// for the add task main button
 const addTaskBtn = document.getElementById("add-task-btn");
-
-// for the add task modal
 const addModal = document.getElementById("task-modal");
 
-// for the add task modal input fields
 const addTaskTitle = document.getElementById("task-title");
 const addTaskDescription = document.getElementById("task-description");
 const addTaskCategory = document.getElementById("task-category");
 const addTaskPriority = document.getElementById("task-priority");
 const addTaskDue = document.getElementById("task-due");
 
-// add task modal buttons
 const formCancel = document.getElementById("form-cancel");
 const formSubmit = document.getElementById("form-submit");
 
-// error fields
 const errorTitle = document.getElementById("error-title");
 const errorDescription = document.getElementById("error-description");
 const errorCategory = document.getElementById("error-category");
 const errorPriority = document.getElementById("error-priority");
-const errorTaskDue = document.getElementById("error-dueDate")
+const errorTaskDue = document.getElementById("error-dueDate");
 
-// empty list for tasks to be added
+// array to store tasks
+let tasks = JSON.parse(localStorage.getItem("taskforge-tasks"));
 
-addTaskBtn.addEventListener("click", createTask)
+// null means the app is opened for the first time
+if (tasks === null) {
+    tasks = createSampleTasks();
+    saveTasks();
+}
 
-formSubmit.addEventListener("click", modalAddTask)
+function saveTasks() {
+    localStorage.setItem("taskforge-tasks", JSON.stringify(tasks));
+}
 
-formCancel.addEventListener("click", modalCancel)
+function makeId() {
+    return Date.now() + "-" + Math.random().toString(36).slice(2, 7);
+}
 
-function displayTasks() {
-    tasks.forEach(element => {
-        let card = taskTemplate.content.firstElementChild.cloneNode(true);
+// gives a date like 2026-10-10, moved by some days from today
+function getDateString(daysFromNow) {
+    const date = new Date();
+    date.setDate(date.getDate() + daysFromNow);
 
-        card.querySelector(".task-title").textContent = element.title;
-        card.querySelector(".task-description").textContent = element.description;
-        card.querySelector(".task-category").textContent = element.category;
-        card.querySelector(".task-priority").textContent = element.priority;
-        card.querySelector(".task-due").textContent = element.dueDate;
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
 
-        taskList.prepend(card);
+    return year + "-" + month + "-" + day;
+}
+
+// sample tasks for the first time
+function createSampleTasks() {
+    const samples = [
+        { title: "Finish DOM assignment", description: "Build the TaskForge dashboard with all features.", category: "school", priority: "critical", days: 3, completed: false },
+        { title: "Fix login bug", description: "Users get logged out after refreshing the page.", category: "frontend", priority: "high", days: -2, completed: false },
+        { title: "Design database", description: "Plan the tables for users, orders and payments.", category: "backend", priority: "high", days: 5, completed: false },
+        { title: "Buy groceries", description: "Rice, tomatoes, onions and fruits for the week.", category: "personal", priority: "low", days: 1, completed: false },
+        { title: "Submit weekly report", description: "Send the progress report to the team lead.", category: "work", priority: "medium", days: -5, completed: true },
+        { title: "Connect payment API", description: "Link the checkout page to the payment sandbox.", category: "fintech", priority: "critical", days: 7, completed: false },
+        { title: "Study for JS quiz", description: "Review arrays, functions, objects and the DOM.", category: "school", priority: "medium", days: -1, completed: false },
+        { title: "Clean API routes", description: "Split the big routes file into smaller files.", category: "backend", priority: "low", days: 14, completed: false },
+        { title: "Build responsive navbar", description: "Make the menu collapse on small screens.", category: "frontend", priority: "medium", days: 4, completed: true },
+        { title: "Call the bank", description: "Ask about the failed transfer from last Friday.", category: "fintech", priority: "high", days: 0, completed: false },
+        { title: "Clean the apartment", description: "Sweep, mop and organise the desk and shelves.", category: "other", priority: "low", days: 10, completed: true }
+    ];
+
+    const oneDay = 24 * 60 * 60 * 1000;
+
+    // turn each sample into a full task
+    return samples.map((sample, index) => {
+        return {
+            id: makeId(),
+            title: sample.title,
+            description: sample.description,
+            category: sample.category,
+            priority: sample.priority,
+            dueDate: getDateString(sample.days),
+            createdAt: Date.now() - index * oneDay,
+            completed: sample.completed
+        };
     });
 }
 
+// show tasks
+function createTaskCard(task) {
+    const card = taskTemplate.content.firstElementChild.cloneNode(true);
+
+    card.dataset.id = task.id;
+
+    card.querySelector(".task-title").textContent = task.title;
+    card.querySelector(".task-description").textContent = task.description;
+    card.querySelector(".task-category").textContent = task.category;
+    card.querySelector(".task-priority").textContent = task.priority;
+    card.querySelector(".task-due").textContent = task.dueDate;
+    card.querySelector(".task-created").textContent = new Date(task.createdAt).toLocaleDateString();
+
+    return card;
+}
+
+function renderTasks() {
+    taskList.replaceChildren();
+
+    tasks.forEach((task) => {
+        taskList.append(createTaskCard(task));
+    });
+}
+
+// modal pop up to create tasks
 function createTask() {
     addModal.classList.remove("hidden");
+
     // localStorage.clear();
 }
 
-function modalAddTask(event) {
-    event.preventDefault()
+// empty the inputs and the error messages
+function resetForm() {
+    errorTitle.textContent = ""; errorDescription.textContent = ""; errorCategory.textContent = ""; errorPriority.textContent = ""; errorTaskDue.textContent = "";
+    addTaskTitle.value = ""; addTaskDescription.value = ""; addTaskCategory.value = ""; addTaskPriority.value = ""; addTaskDue.value = "";
+}
 
-    if (addTaskTitle.value === "") {
-        errorTitle.innerHTML = "Title field cannot be empty";
+// modal cancel btn
+function modalCancel() {
+    addModal.classList.add("hidden");
+    resetForm();
+}
+
+// add a task
+function modalAddTask(event) {
+    event.preventDefault();
+
+    // clear the old error messages first
+    errorTitle.textContent = ""; errorDescription.textContent = ""; errorCategory.textContent = ""; errorPriority.textContent = ""; errorTaskDue.textContent = "";
+
+    // trim removes spaces at the start and end
+    const title = addTaskTitle.value.trim();
+    const description = addTaskDescription.value.trim();
+
+    let isValid = true;
+
+    if (title === "") {
+        errorTitle.textContent = "Title field cannot be empty";
+        isValid = false;
+    } else if (title.length < 3) {
+        errorTitle.textContent = "Title must be at least 3 characters";
+        isValid = false;
     }
 
-    if (addTaskDescription.value === "") {
-        errorDescription.innerHTML = "Description field cannot be empty";
+    if (description === "") {
+        errorDescription.textContent = "Description field cannot be empty";
+        isValid = false;
+    } else if (description.length < 10) {
+        errorDescription.textContent = "Description must be at least 10 characters";
+        isValid = false;
     }
 
     if (addTaskCategory.value === "") {
-        errorCategory.innerHTML = "Category field cannot be empty";
+        errorCategory.textContent = "Category field cannot be empty";
+        isValid = false;
     }
 
     if (addTaskPriority.value === "") {
-        errorPriority.innerHTML = "Priority field cannot be empty";
+        errorPriority.textContent = "Priority field cannot be empty";
+        isValid = false;
     }
 
     if (addTaskDue.value === "") {
-        errorTaskDue.innerHTML = "Due date field cannot be empty";
+        errorTaskDue.textContent = "Due date field cannot be empty";
+        isValid = false;
     }
 
-    if ((addTaskTitle.value.length > 1) && (addTaskDescription.value.length > 1) && (addTaskCategory.value.length > 1) && (addTaskPriority.value.length > 1) && (addTaskDue.value.length > 1)) {
+    if (isValid) {
+        const newTask = {
+            id: makeId(),
+            title: title,
+            description: description,
+            category: addTaskCategory.value,
+            priority: addTaskPriority.value,
+            dueDate: addTaskDue.value,
+            createdAt: Date.now(),
+            completed: false
+        };
 
-        let myTaskInfo = { title: addTaskTitle.value, description: addTaskDescription.value, category: addTaskCategory.value, priority: addTaskPriority.value, dueDate: addTaskDue.value };
+        tasks.unshift(newTask);
+        saveTasks();
+        renderTasks();
 
-        // console.log(myTaskInfo)
-
-        // localStorage.setItem("tasks", JSON.stringify(myTaskInfo));
-
-        appendToStoredArray("tasks", myTaskInfo);
-        tasks.push(myTaskInfo);
-        console.log(tasks);
-
-        let card = taskTemplate.content.firstElementChild.cloneNode(true);
-
-        card.querySelector(".task-title").textContent = addTaskTitle.value;
-        card.querySelector(".task-description").textContent = addTaskDescription.value;
-        card.querySelector(".task-category").textContent = addTaskCategory.value;
-        card.querySelector(".task-priority").textContent = addTaskPriority.value;
-        card.querySelector(".task-due").textContent = addTaskDue.value;
-
-        taskList.prepend(card);
-
-        // to re-assign my input to be empty
-        errorTitle.innerHTML = ""; errorDescription.innerHTML = ""; errorCategory.innerHTML = ""; errorPriority.innerHTML = ""; errorTaskDue.innerHTML = "";
-        addTaskTitle.value = ""; addTaskDescription.value = ""; addTaskCategory.value = ""; addTaskPriority.value = ""; addTaskDue.value = "";
-
+        modalCancel();
     }
-
-
 }
 
-function modalCancel() {
-    addModal.classList.add("hidden")
-}
+addTaskBtn.addEventListener("click", createTask);
+formSubmit.addEventListener("click", modalAddTask);
+formCancel.addEventListener("click", modalCancel);
 
-// to append to the stored files in local storage
-function appendToStoredArray(key, newItem) {
-    const arr = JSON.parse(localStorage.getItem(key)) || [];
-    arr.push(newItem);
-    localStorage.setItem(key, JSON.stringify(arr));
-}
+renderTasks();
