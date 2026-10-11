@@ -39,6 +39,8 @@ const filterPriority = document.getElementById("filter-priority");
 const filterCategory = document.getElementById("filter-category");
 const sortSelect = document.getElementById("sort-select");
 
+const themeToggle = document.getElementById("theme-toggle");
+
 const selectAll = document.getElementById("select-all");
 const selectedCount = document.getElementById("selected-count");
 const bulkComplete = document.getElementById("bulk-complete");
@@ -381,6 +383,33 @@ function requestCancel() {
     }
 }
 
+// dark mode: the dark class on the html tag turns the dark styles on
+function applyTheme(isDark) {
+    document.documentElement.classList.toggle("dark", isDark);
+    themeToggle.textContent = isDark ? "Light mode" : "Dark mode";
+}
+
+// true if any modal is open
+function isModalOpen() {
+    return !addModal.classList.contains("hidden") ||
+        !deleteModal.classList.contains("hidden") ||
+        !detailsModal.classList.contains("hidden") ||
+        !discardModal.classList.contains("hidden");
+}
+
+// close the modal that is on top
+function closeTopModal() {
+    if (!discardModal.classList.contains("hidden")) {
+        discardModal.classList.add("hidden");
+    } else if (!deleteModal.classList.contains("hidden")) {
+        closeDeleteModal();
+    } else if (!detailsModal.classList.contains("hidden")) {
+        closeDetails();
+    } else if (!addModal.classList.contains("hidden")) {
+        requestCancel();
+    }
+}
+
 // open the delete modal and remember which tasks it is for
 function openDeleteModal(ids) {
     idsToDelete = ids;
@@ -416,6 +445,7 @@ function createTask() {
     formSubmit.textContent = "Add task";
 
     addModal.classList.remove("hidden");
+    addTaskTitle.focus();
 
     // localStorage.clear();
 }
@@ -598,6 +628,44 @@ filterPriority.addEventListener("change", renderTasks);
 filterCategory.addEventListener("change", renderTasks);
 sortSelect.addEventListener("change", renderTasks);
 
+themeToggle.addEventListener("click", function () {
+    const isDark = !document.documentElement.classList.contains("dark");
+    applyTheme(isDark);
+    localStorage.setItem("taskforge-theme", isDark ? "dark" : "light");
+});
+
+// keyboard shortcuts
+document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+        closeTopModal();
+        return;
+    }
+
+    // ctrl + enter submits the form
+    if (event.ctrlKey && event.key === "Enter") {
+        if (!addModal.classList.contains("hidden")) {
+            formSubmit.click();
+        }
+        return;
+    }
+
+    // n and / should not work while typing or when a modal is open
+    const tag = event.target.tagName;
+    const isTyping = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+
+    if (isTyping || isModalOpen()) {
+        return;
+    }
+
+    if (event.key.toLowerCase() === "n") {
+        event.preventDefault();
+        createTask();
+    } else if (event.key === "/") {
+        event.preventDefault();
+        searchInput.focus();
+    }
+});
+
 deleteCancel.addEventListener("click", closeDeleteModal);
 deleteConfirm.addEventListener("click", confirmDelete);
 
@@ -623,4 +691,6 @@ discardConfirm.addEventListener("click", function () {
     modalCancel();
 });
 
+// load the saved theme, then show the tasks
+applyTheme(localStorage.getItem("taskforge-theme") === "dark");
 renderTasks();
