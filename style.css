@@ -1,0 +1,24 @@
+
+/* priority: colored left border + badge*/
+.task-card.priority-low      { border-left-color: #22c55e; }
+.task-card.priority-medium   { border-left-color: #eab308; }
+.task-card.priority-high     { border-left-color: #f97316; }
+.task-card.priority-critical { border-left-color: #dc2626; }
+
+.task-card.priority-low .task-priority      { background: #22c55e; color: #fff; }
+.task-card.priority-medium .task-priority   { background: #eab308; color: #1f2937; }
+.task-card.priority-high .task-priority     { background: #f97316; color: #fff; }
+.task-card.priority-critical .task-priority { background: #dc2626; color: #fff; }
+
+/* status badge */
+.task-card.pending .task-status   { background: #dbeafe; color: #1e40af; }
+.task-card.completed .task-status { background: #dcfce7; color: #166534; }
+.task-card.overdue .task-status   { background: #fee2e2; color: #991b1b; }
+
+/*completed: faded with a line through the title*/
+.task-card.completed { opacity: 0.6; }
+.task-card.completed .task-title { text-decoration: line-through; }
+
+/* overdue: red tint (comes after priority so it wins the border color) */
+.task-card.overdue { border-left-color: #dc2626; background-color: #fef2f2; }
+.dark .task-card.overdue { background-color: #3b1d1d; }

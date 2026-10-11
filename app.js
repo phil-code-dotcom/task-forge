@@ -168,6 +168,19 @@ function updateStats() {
     statOverdue.textContent = overdue;
 }
 
+// find the task that a clicked button belongs to
+function getTaskFromElement(element) {
+    const card = element.closest(".task-card");
+    return tasks.find((task) => task.id === card.dataset.id);
+}
+
+// switch a task between completed and pending
+function completeTask(task) {
+    task.completed = !task.completed;
+    saveTasks();
+    renderTasks();
+}
+
 // modal pop up to create tasks
 function createTask() {
     addModal.classList.remove("hidden");
@@ -250,6 +263,23 @@ function modalAddTask(event) {
         modalCancel();
     }
 }
+
+// one listener on the list handles the buttons of every card
+taskList.addEventListener("click", function (event) {
+    const button = event.target.closest("[data-action]");
+
+    // the click was not on a button
+    if (button === null) {
+        return;
+    }
+
+    const task = getTaskFromElement(button);
+    const action = button.dataset.action;
+
+    if (action === "complete") {
+        completeTask(task);
+    }
+});
 
 addTaskBtn.addEventListener("click", createTask);
 formSubmit.addEventListener("click", modalAddTask);
