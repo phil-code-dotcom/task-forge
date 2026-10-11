@@ -23,6 +23,11 @@ const errorCategory = document.getElementById("error-category");
 const errorPriority = document.getElementById("error-priority");
 const errorTaskDue = document.getElementById("error-dueDate");
 
+const statTotal = document.getElementById("stat-total");
+const statCompleted = document.getElementById("stat-completed");
+const statPending = document.getElementById("stat-pending");
+const statOverdue = document.getElementById("stat-overdue");
+
 // array to store tasks
 let tasks = JSON.parse(localStorage.getItem("taskforge-tasks"));
 
@@ -38,6 +43,21 @@ function saveTasks() {
 
 function makeId() {
     return Date.now() + "-" + Math.random().toString(36).slice(2, 7);
+}
+
+// makes the first letter big: work becomes Work
+function capitalize(word) {
+    return word.charAt(0).toUpperCase() + word.slice(1);
+}
+
+// shows 2026-10-10 as a normal date
+function formatDate(dateString) {
+    return new Date(dateString + "T00:00:00").toLocaleDateString();
+}
+
+// overdue means not completed and the due date is before today
+function isOverdue(task) {
+    return !task.completed && task.dueDate < getDateString(0);
 }
 
 // gives a date like 2026-10-10, moved by some days from today
@@ -93,10 +113,36 @@ function createTaskCard(task) {
 
     card.querySelector(".task-title").textContent = task.title;
     card.querySelector(".task-description").textContent = task.description;
-    card.querySelector(".task-category").textContent = task.category;
-    card.querySelector(".task-priority").textContent = task.priority;
-    card.querySelector(".task-due").textContent = task.dueDate;
+    card.querySelector(".task-category").textContent = capitalize(task.category);
+    card.querySelector(".task-priority").textContent = capitalize(task.priority);
+    card.querySelector(".task-due").textContent = formatDate(task.dueDate);
     card.querySelector(".task-created").textContent = new Date(task.createdAt).toLocaleDateString();
+
+    // classes for the colors (they are in style.css)
+    card.classList.add("priority-" + task.priority);
+
+    if (task.completed) {
+        card.classList.add("completed");
+    } else {
+        card.classList.add("pending");
+    }
+
+    if (isOverdue(task)) {
+        card.classList.add("overdue");
+    }
+
+    // status text
+    let status = "Pending";
+    if (task.completed) {
+        status = "Completed";
+    } else if (isOverdue(task)) {
+        status = "Overdue";
+    }
+    card.querySelector(".task-status").textContent = status;
+
+    // complete button text
+    const completeBtn = card.querySelector('[data-action="complete"]');
+    completeBtn.textContent = task.completed ? "Undo" : "Complete";
 
     return card;
 }
@@ -107,6 +153,19 @@ function renderTasks() {
     tasks.forEach((task) => {
         taskList.append(createTaskCard(task));
     });
+
+    updateStats();
+}
+
+// fill the four numbers at the top
+function updateStats() {
+    const completed = tasks.filter((task) => task.completed).length;
+    const overdue = tasks.filter((task) => isOverdue(task)).length;
+
+    statTotal.textContent = tasks.length;
+    statCompleted.textContent = completed;
+    statPending.textContent = tasks.length - completed;
+    statOverdue.textContent = overdue;
 }
 
 // modal pop up to create tasks
