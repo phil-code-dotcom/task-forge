@@ -83,6 +83,11 @@ let selectedIds = [];
 // ids of the tasks waiting to be deleted
 let idsToDelete = [];
 
+// for the import and export
+const exportBtn = document.getElementById("export-btn");
+const importBtn = document.getElementById("import-btn");
+const importIn = document.getElementById("import-input");
+
 // array to store tasks
 let tasks = JSON.parse(localStorage.getItem("taskforge-tasks"));
 
@@ -484,10 +489,8 @@ function modalCancel() {
 function modalAddTask(event) {
     event.preventDefault();
 
-    // clear the old error messages first
     errorTitle.textContent = ""; errorDescription.textContent = ""; errorCategory.textContent = ""; errorPriority.textContent = ""; errorTaskDue.textContent = "";
 
-    // trim removes spaces at the start and end
     const title = addTaskTitle.value.trim();
     const description = addTaskDescription.value.trim();
 
@@ -561,7 +564,6 @@ function modalAddTask(event) {
 taskList.addEventListener("click", function (event) {
     const button = event.target.closest("[data-action]");
 
-    // the click was not on a button
     if (button === null) {
         return;
     }
@@ -689,6 +691,37 @@ discardKeep.addEventListener("click", function () {
 discardConfirm.addEventListener("click", function () {
     discardModal.classList.add("hidden");
     modalCancel();
+});
+
+//listener for the export button
+exportBtn.addEventListener("click", () => {
+    const blob = new Blob([JSON.stringify(tasks, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "data.json";
+    a.click();
+    URL.revokeObjectURL(url); // cleanup
+});
+
+// listener for the json import
+importBtn.addEventListener("click", () => importIn.click());
+
+importIn.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+        const myArray = JSON.parse(event.target.result);
+        // console.log(myArray); // use it however you need
+        myArray.forEach((obj) => {
+            tasks.unshift(obj);
+        });
+    };
+
+    reader.readAsText(file);
 });
 
 // load the saved theme, then show the tasks
