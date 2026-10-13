@@ -88,6 +88,10 @@ const exportBtn = document.getElementById("export-btn");
 const importBtn = document.getElementById("import-btn");
 const importIn = document.getElementById("import-input");
 
+// for the drag and drop feature
+const dropZone = document.getElementById("dropZone");
+// console.log(dropZone);
+
 // array to store tasks
 let tasks = JSON.parse(localStorage.getItem("taskforge-tasks"));
 
@@ -721,6 +725,22 @@ importIn.addEventListener("change", (e) => {
         });
     };
 
+    reader.readAsText(file);
+});
+
+// listener for the drag and drop
+dropZone.addEventListener("dragover", (e) => e.preventDefault());
+dropZone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        const myArray = JSON.parse(event.target.result);
+        // console.log(myArray);
+        myArray.forEach((obj) => {
+            tasks.unshift(obj);
+        });
+    };
     reader.readAsText(file);
 });
 
